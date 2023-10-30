@@ -1,7 +1,11 @@
 import sys
+import random
+import tkinter as tk
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from PyQt5.QtWebEngineWidgets import *
+from tkinter import ttk
 
 class WebBrowser(QMainWindow):
     def __init__(self):
@@ -9,7 +13,7 @@ class WebBrowser(QMainWindow):
         self.browser = QWebEngineView()
         self.setupUI()
         self.setWindowTitle("Saffron Browser")
-
+            
     def setupUI(self):
         # Create a central widget to hold the browser
         central_widget = QWidget()
@@ -20,34 +24,29 @@ class WebBrowser(QMainWindow):
         nav_toolbar = QToolBar()
         layout.addWidget(nav_toolbar)
 
-        back_button = QAction("Back", self)
-        back_button.setStatusTip("Back to previous page")
-        back_button.triggered.connect(self.browser.back)
-        nav_toolbar.addAction(back_button)
+        # Define action names and tooltips along with corresponding icon filenames
+        actions = [
+            ("Back", "Back to previous page", self.browser.back, "back.png"),
+            ("Forward", "Forward to next page", self.browser.forward, "forward.png"),
+            ("Refresh", "Reload page", self.browser.reload, "refresh.png"),
+            ("Home", "Go to homepage", self.navigate_home, "home.png"),
+            ("Go", "Go to the entered URL", self.navigate_to_url, "go.png")
+        ]
 
-        forward_button = QAction("Forward", self)
-        forward_button.setStatusTip("Forward to next page")
-        forward_button.triggered.connect(self.browser.forward)
-        nav_toolbar.addAction(forward_button)
-
-        reload_button = QAction("Reload", self)
-        reload_button.setStatusTip("Reload page")
-        reload_button.triggered.connect(self.browser.reload)
-        nav_toolbar.addAction(reload_button)
-
-        home_button = QAction("Home", self)
-        home_button.setStatusTip("Go to homepage")
-        home_button.triggered.connect(self.navigate_home)
-        nav_toolbar.addAction(home_button)
+        for action_name, tooltip, slot, icon_filename in actions:
+            action = QAction(action_name, self)
+            action.setStatusTip(tooltip)
+            action.triggered.connect(slot)
+            
+            # Load the icon with a fixed size
+            icon = QIcon(icon_filename)
+            action.setIcon(icon)
+            
+            nav_toolbar.addAction(action)
 
         self.url_bar = QLineEdit()
         self.url_bar.returnPressed.connect(self.navigate_to_url)
         nav_toolbar.addWidget(self.url_bar)
-
-        go_button = QAction("Go", self)
-        go_button.setStatusTip("Go to the entered URL")
-        go_button.triggered.connect(self.navigate_to_url)
-        nav_toolbar.addAction(go_button)
 
         # Set the browser as the central widget
         layout.addWidget(self.browser)
